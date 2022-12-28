@@ -33,7 +33,7 @@ pub async fn after_hook(
     error: Result<(), CommandError>,
 ) {
     let span = span!(Level::WARN, "after_hook", %msg.content, ?cmd_name);
-
+    msg.delete(&ctx.http).await;
     async move {
         // Print out an error if it happened
         if let Err(why) = error {
@@ -47,3 +47,7 @@ pub async fn after_hook(
     .instrument(span)
     .await
 }
+
+// async fn delete_message(ctx: &Context, msg: &Message) {
+//     msg.delete(ctx.http);
+// }

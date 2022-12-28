@@ -37,6 +37,7 @@ pub async fn help(
     Ok(())
 }
 
+/*
 #[command]
 #[only_in(guilds)]
 /// Adds Sunny to the user's current voice channel.
@@ -96,6 +97,7 @@ pub async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 
     Ok(())
 }
+*/
 
 fn validate_url(mut args: Args) -> Option<String> {
     let mut url: String = args.single().ok()?;
@@ -115,7 +117,10 @@ fn validate_url(mut args: Args) -> Option<String> {
 #[only_in(guilds)]
 #[usage("<url>")]
 #[example("https://www.youtube.com/watch?v=dQw4w9WgXcQ")]
-#[checks(In_Voice)]
+#[checks(Is_Channel_DWin_Audio)]
+// #[checks(In_Voice)]
+// #[checks(Clear_Messages)]
+#[checks(Join_Voice)]
 /// While Sunny is in a voice channel, you may run the play command so that she
 /// can start streaming the given video URL.
 pub async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
@@ -133,11 +138,12 @@ pub async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         format!("Added song to queue: position {}", len - 1)
     };
 
-    msg.reply(&ctx.http, reply).await?;
+    // msg.reply(&ctx.http, reply).await?;
 
     Ok(())
 }
 
+/*
 #[command]
 #[aliases(pn)]
 #[max_args(1)]
@@ -224,6 +230,7 @@ pub async fn now_playing(ctx: &Context, msg: &Message) -> CommandResult {
 
     Ok(())
 }
+ */
 
 #[command]
 #[only_in(guilds)]
@@ -236,7 +243,7 @@ pub async fn pause(ctx: &Context, msg: &Message) -> CommandResult {
 
     queue::pause(ctx, guild_id).await?;
 
-    msg.reply(&ctx.http, "Track paused").await?;
+    // msg.reply(&ctx.http, "Track paused").await?;
 
     Ok(())
 }
@@ -252,7 +259,7 @@ pub async fn resume(ctx: &Context, msg: &Message) -> CommandResult {
 
     queue::resume(ctx, guild_id).await?;
 
-    msg.reply(&ctx.http, "Track resumed").await?;
+    // msg.reply(&ctx.http, "Track resumed").await?;
 
     Ok(())
 }
@@ -268,14 +275,14 @@ pub async fn skip(ctx: &Context, msg: &Message) -> CommandResult {
 
     let len = queue::skip(ctx, guild_id).await?;
 
-    msg.reply(
-        &ctx.http,
-        format!(
-            "Song skipped: {} in queue.",
-            len.checked_sub(1).unwrap_or_default()
-        ),
-    )
-    .await?;
+    // msg.reply(
+    //     &ctx.http,
+    //     format!(
+    //         "Song skipped: {} in queue.",
+    //         len.checked_sub(1).unwrap_or_default()
+    //     ),
+    // )
+    // .await?;
     Ok(())
 }
 
@@ -290,11 +297,27 @@ pub async fn stop(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
 
     queue::stop(ctx, guild_id).await?;
 
-    msg.reply(&ctx.http, "Queue cleared.").await?;
+    // msg.reply(&ctx.http, "Queue cleared.").await?;
 
     Ok(())
 }
 
+#[command]
+#[only_in(guilds)]
+#[aliases(q, queueueueu)]
+/// Shows the current queue
+pub async fn queue(ctx: &Context, msg: &Message) -> CommandResult {
+    println!("Queue called");
+    let guild_id = msg
+        .guild_id
+        .ok_or_else(|| SunnyError::log("message guild id could not be found"))?;
+
+    display_queue::send_embed(ctx, guild_id, msg.channel_id).await?;
+    println!("Queue end?");
+    Ok(())
+}
+
+/*
 #[command]
 #[only_in(guilds)]
 #[aliases(q, queueueueu)]
@@ -342,3 +365,4 @@ pub async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.say(&ctx.http, "Pong!").await?;
     Ok(())
 }
+*/

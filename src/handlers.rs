@@ -14,14 +14,14 @@ pub struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _ready: Ready) {
-        let activity = Activity::streaming(
-            "\u{1f4fb} Tropico News Today \u{1f9e8}",
-            "https://www.youtube.com/watch?v=BmKMrUMS9lg",
-        );
+        // let activity = Activity::streaming(
+        //     "\u{1f4fb} Tropico News Today \u{1f9e8}",
+        //     "https://www.youtube.com/watch?v=BmKMrUMS9lg",
+        // );
 
         let status = OnlineStatus::DoNotDisturb;
 
-        ctx.set_presence(Some(activity), status).await;
+        // ctx.set_presence(Some(activity), status).await;
     }
 }
 
@@ -35,11 +35,11 @@ impl VoiceEventHandler for TrackPlayNotifier {
     #[instrument(name = "track_play_notifier_handler")]
     async fn act(&self, event: &EventContext<'_>) -> Option<Event> {
         if let EventContext::Track(_track) = event {
-            let res =
-                now_playing::send_embed(&self.cfg.ctx, self.cfg.guild_id, self.cfg.text_channel_id)
-                    .await;
+            // let res =
+            //     now_playing::send_embed(&self.cfg.ctx, self.cfg.guild_id, self.cfg.text_channel_id)
+            //         .await;
 
-            emit!(res, Level::WARN);
+            // emit!(res, Level::WARN);
         }
 
         None

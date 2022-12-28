@@ -5,6 +5,7 @@ mod checks;
 mod commands;
 mod effects;
 mod handlers;
+mod helper_functions;
 mod hooks;
 mod structs;
 mod utils;
@@ -29,22 +30,23 @@ use tokio::signal::unix::{signal, SignalKind};
 use tracing::{event, Level};
 
 #[group]
-#[commands(
-    join,
-    leave,
-    pause,
-    play,
-    play_next,
-    ping,
-    resume,
-    remove_at,
-    shuffle,
-    skip,
-    stop,
-    swap,
-    now_playing,
-    queue
-)]
+#[commands(pause, play, resume, skip, stop)]
+// #[commands(
+//     join,
+//     leave,
+//     pause,
+//     play,
+//     play_next,
+//     ping,
+//     resume,
+//     remove_at,
+//     shuffle,
+//     skip,
+//     stop,
+//     swap,
+//     now_playing,
+//     queue
+// )]
 struct General;
 
 #[tokio::main]

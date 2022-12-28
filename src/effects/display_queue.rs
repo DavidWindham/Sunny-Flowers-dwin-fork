@@ -3,7 +3,7 @@ use std::time::Duration;
 use serenity::{
     builder::CreateActionRow,
     client::Context,
-    futures::prelude::*,
+    futures::{executor, prelude::*},
     model::{
         channel::Message,
         id::{ChannelId, GuildId},
@@ -45,49 +45,62 @@ fn generate_embed(queue: &[TrackHandle], page: usize) -> serenity::builder::Crea
     }
 
     let mut e = serenity::builder::CreateEmbed::default();
-    e.author(|a| a.name("Queueueueueu"));
+    // e.author(|a| a.name("Queueueueueu"));
 
     if let Some(track) = queue.first() {
         let m = track.metadata();
 
+        let pos = executor::block_on(async { track.get_info().await.expect("").position });
+
+        let (curr_min, curr_sec) = split_duration(pos);
+        let (max_min, max_sec) = split_duration(m.duration.unwrap_or_default());
+        let progress = format!("{}:{:02} / {}:{:02}", curr_min, curr_sec, max_min, max_sec);
+
         e.description(format!(
-            "**Now Playing:** {} by {}",
+            "**Now Playing** \n*{}*\nBy: *{}*\n\n*{}*",
             get_title(m),
-            get_artist(m)
+            get_artist(m),
+            progress
         ));
+
+        if let Some(thumbnail) = &m.thumbnail {
+            e.thumbnail(thumbnail);
+        }
+
+        // * Change to intersperse after #79524 stablizes
+        e.field(
+            "# Title",
+            string_or_default(titles.into_iter().collect::<String>().trim_end(), "Queue"),
+            true,
+        );
+
+        e.field(
+            "Artist",
+            string_or_default(artists.into_iter().collect::<String>().trim_end(), "is"),
+            true,
+        );
+
+        e.field(
+            "Duration",
+            string_or_default(durs.into_iter().collect::<String>().trim_end(), "empty"),
+            true,
+        );
+
+        e.footer(|f| {
+            let seconds = total_duration.as_secs() % 60;
+            let minutes = total_duration.as_secs() / 60;
+
+            f.text(format!(
+                "Page {}/{} | Total Duration: {:02}:{:02}",
+                page + 1,
+                (queue.len() / 10 + 1),
+                minutes,
+                seconds,
+            ))
+        });
+    } else {
+        e.description(format!("**Queue is empty**"));
     }
-
-    // * Change to intersperse after #79524 stablizes
-    e.field(
-        "# Title",
-        string_or_default(titles.into_iter().collect::<String>().trim_end(), "Queue"),
-        true,
-    );
-
-    e.field(
-        "Artist",
-        string_or_default(artists.into_iter().collect::<String>().trim_end(), "is"),
-        true,
-    );
-
-    e.field(
-        "Duration",
-        string_or_default(durs.into_iter().collect::<String>().trim_end(), "empty"),
-        true,
-    );
-
-    e.footer(|f| {
-        let seconds = total_duration.as_secs() % 60;
-        let minutes = total_duration.as_secs() / 60;
-
-        f.text(format!(
-            "Page {}/{} | Total Duration: {:02}:{:02}",
-            page + 1,
-            (queue.len() / 10 + 1),
-            minutes,
-            seconds,
-        ))
-    });
 
     e
 }
@@ -154,18 +167,35 @@ pub async fn send_embed(
     channel_id: ChannelId,
 ) -> SunnyResult<()> {
     // Retrieve the current queue
-    let cq = get_queue(ctx, guild_id).await?;
+    let mut cq = get_queue(ctx, guild_id).await?;
 
     // Send initial queue message
-    let message = channel_id
+    let mut message = channel_id
         .send_message(&ctx.http, |m| {
-            m.components(|c| c.set_action_rows(vec![build_action_row(0, cq.len())]));
+            // m.components(|c| c.set_action_rows(vec![build_action_row(0, cq.len())]));
             m.set_embed(generate_embed(&cq, 0))
         })
         .await
         .map_err(|e| SunnyError::log(format!("Unable to send queue message: {:?}", e).as_str()))?;
 
-    await_interactions(ctx, message, guild_id).await
+    loop {
+        tokio::time::sleep(Duration::from_secs(1)).await;
+        cq = get_queue(ctx, guild_id).await?;
+
+        message
+            .edit(&ctx.http, |m| {
+                // m.components(|c| c.set_action_rows(vec![build_action_row(0, cq.len())]));
+                m.set_embed(generate_embed(&cq, 0))
+            })
+            .await
+            .map_err(|e| {
+                SunnyError::log(format!("Unable to send queue message: {:?}", e).as_str())
+            })?;
+    }
+
+    Ok(())
+
+    // await_interactions(ctx, message, guild_id).await
 }
 
 async fn await_interactions(ctx: &Context, mut msg: Message, guild_id: GuildId) -> SunnyResult<()> {
