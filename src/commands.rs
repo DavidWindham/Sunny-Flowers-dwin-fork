@@ -320,19 +320,6 @@ pub async fn queue(ctx: &Context, msg: &Message) -> CommandResult {
 /*
 #[command]
 #[only_in(guilds)]
-#[aliases(q, queueueueu)]
-/// Shows the current queue
-pub async fn queue(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = msg
-        .guild_id
-        .ok_or_else(|| SunnyError::log("message guild id could not be found"))?;
-
-    display_queue::send_embed(ctx, guild_id, msg.channel_id).await?;
-    Ok(())
-}
-
-#[command]
-#[only_in(guilds)]
 #[aliases(r, remove)]
 #[max_args(1)]
 #[example("2")]

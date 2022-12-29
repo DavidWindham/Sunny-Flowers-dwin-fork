@@ -92,7 +92,7 @@ pub async fn in_same_voice_check_and_join(
                 println!("Joining and clearning");
                 join_voice(ctx, msg).await?;
                 clear_messages(ctx, msg, args.clone()).await;
-                commands::queue(ctx, msg, args.clone()).await;
+                // commands::queue(ctx, msg, args.clone()).await;
             }
         }
         Err(e) => {
