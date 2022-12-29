@@ -17,8 +17,8 @@ serenity = { version = "0.10", features = [
     "unstable_discord_api",
     "collector"
 ]}
-songbird = { version = "0.2", features = ["builtin-queue"] }
-tokio = { version = "1.11", features = ["macros", "rt-multi-thread", "signal"] }
+songbird = { version = "0.2.2", features = ["builtin-queue"] }
+tokio = { version = "1.22.0", features = ["macros", "rt-multi-thread", "signal"] }
 chrono = "0.4"
 url = "2"
 rand = {version = "0.8", features = ["small_rng"]}
