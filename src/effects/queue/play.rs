@@ -1,5 +1,6 @@
 use serenity::{client::Context, model::id::GuildId};
 use songbird::input::Restartable;
+use std::env;
 use tracing::instrument;
 
 use crate::utils::{SunnyError, SunnyResult};
@@ -17,6 +18,10 @@ pub async fn play(
     url: String,
     enqueu_at: EnqueueAt,
 ) -> SunnyResult<usize> {
+    let spotify_client_id =
+        env::var("SPOTIFY_CLIENT_ID").expect("Environment variable SPOTIFY_CLIENT_ID not found");
+    println!("Spotify client ID: {}", spotify_client_id);
+
     let source = Restartable::ytdl(url, true).await.map_err(|e| {
         SunnyError::user_and_log(
             "Error starting stream",

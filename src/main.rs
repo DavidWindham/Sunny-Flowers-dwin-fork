@@ -7,8 +7,11 @@ mod effects;
 mod handlers;
 mod helper_functions;
 mod hooks;
+mod play_helper;
 mod structs;
 mod utils;
+
+pub mod url_handler;
 
 use std::env;
 

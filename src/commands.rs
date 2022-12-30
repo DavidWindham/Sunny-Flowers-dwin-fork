@@ -18,6 +18,7 @@ use crate::{
         self, display_queue, now_playing,
         queue::{self, EnqueueAt},
     },
+    play_helper::get_urls,
     structs::EventConfig,
     utils::SunnyError,
 };
@@ -130,17 +131,52 @@ pub async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         .guild_id
         .ok_or_else(|| SunnyError::log("message guild id could not be found"))?;
 
-    let len = queue::play(ctx, guild_id, url, EnqueueAt::Back).await?;
+    // let urls_call = get_urls(url);
+    let urls_call = get_urls(url).await;
 
-    let reply = if len == 1 {
-        "Started playing the song".to_string()
-    } else {
-        format!("Added song to queue: position {}", len - 1)
-    };
+    // let _len = queue::play(ctx, guild_id, url, EnqueueAt::Back).await?;
+
+    // let reply = if len == 1 {
+    //     "Started playing the song".to_string()
+    // } else {
+    //     format!("Added song to queue: position {}", len - 1)
+    // };
 
     // msg.reply(&ctx.http, reply).await?;
 
+    match urls_call {
+        Ok(urls) => {
+            for single_url in urls {
+                let single_url_call =
+                    queue::play(ctx, guild_id, single_url.to_string(), EnqueueAt::Back).await;
+
+                match single_url_call {
+                    Ok(new_length) => {
+                        println!("New call has completed, new length: {}", new_length);
+                    }
+                    Err(e) => {
+                        eprintln!("Error with adding a single URL: {}", e);
+                        // return Err(e);
+                    }
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!("Error getting URL's");
+        }
+    }
+
     Ok(())
+}
+
+enum UrlType {
+    Youtube,
+    YoutubePlaylist,
+    SpotifyPlaylist,
+}
+
+fn check_url_type(url: String) -> Result<UrlType, String> {
+    Ok(UrlType::Youtube)
 }
 
 /*
