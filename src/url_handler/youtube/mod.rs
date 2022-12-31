@@ -122,7 +122,7 @@ pub async fn get_youtube_urls_from_playlist_url(
                         match response_json_call {
                             Ok(response_json_new) => response_json = response_json_new,
                             Err(e) => {
-                                return Err("Error getting JSON".to_string());
+                                return Err(format!("Error getting JSON: {}", e));
                             }
                         }
 
@@ -168,8 +168,7 @@ pub async fn get_youtube_urls_from_playlist_url(
                 }
             }
             Err(e) => {
-                return Err("Error getting response body".to_string());
-                // break;
+                return Err(format!("Error getting response body: {}", e));
             }
         }
     }

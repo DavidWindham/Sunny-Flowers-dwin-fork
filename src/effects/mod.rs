@@ -35,7 +35,7 @@ fn get_artist(m: &Metadata) -> &str {
         .unwrap_or("Unknown Artist")
 }
 
-pub fn get_song(m: &Metadata) -> String {
+pub fn _get_song(m: &Metadata) -> String {
     format!("{} by {}", get_title(m), get_artist(m))
 }
 

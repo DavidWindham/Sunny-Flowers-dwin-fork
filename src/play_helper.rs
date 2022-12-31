@@ -35,7 +35,7 @@ pub async fn get_urls(url: String) -> Result<Vec<String>, String> {
     return Ok(vec![]);
 }
 
-fn get_url_for_search_term(search_term: String) {}
+fn _get_url_for_search_term(search_term: String) {}
 
 async fn get_urls_for_spotify_playlist(
     client_id: String,

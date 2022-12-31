@@ -96,7 +96,7 @@ async fn get_playlist_tracks(
             }
         }
         Err(e) => {
-            eprintln!("Error getting PlaylistId from id");
+            eprintln!("Error getting PlaylistId from id: {}", e);
         }
     }
 

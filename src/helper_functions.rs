@@ -1,10 +1,9 @@
 use serenity::{
     framework::standard::{Args, Reason},
     futures::stream::{self, StreamExt},
-    model::prelude::{Message, MessageId},
+    model::prelude::Message,
     prelude::Context,
 };
-use tokio::try_join;
 
 use crate::{effects, structs::EventConfig, utils::SunnyError};
 
@@ -65,7 +64,7 @@ pub async fn join_voice(ctx: &Context, msg: &Message) -> Result<(), SunnyError> 
 pub async fn clear_messages(
     ctx: &Context,
     msg: &Message,
-    args: Args,
+    _args: Args,
 ) -> Result<(), serenity::Error> {
     println!("Clear Message helper function called");
     let channel_id = msg.channel_id;
@@ -114,7 +113,7 @@ pub async fn clear_messages(
 // }
 
 pub async fn is_channel_dwin_audio_helper(ctx: &Context, msg: &Message) -> Result<(), Reason> {
-    let songbird = songbird::get(ctx)
+    let _songbird = songbird::get(ctx)
         .await
         .ok_or_else(|| SunnyError::log("Failed to get songbird"))?;
 

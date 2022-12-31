@@ -1,4 +1,4 @@
-use std::{collections::HashSet, num::NonZeroUsize};
+use std::collections::HashSet;
 
 use serenity::{
     client::Context,
@@ -15,11 +15,10 @@ use url::Url;
 use crate::{
     checks::*,
     effects::{
-        self, display_queue, now_playing,
+        self, display_queue,
         queue::{self, EnqueueAt},
     },
     play_helper::get_urls,
-    structs::EventConfig,
     utils::SunnyError,
 };
 
@@ -162,7 +161,7 @@ pub async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
             }
         }
         Err(e) => {
-            eprintln!("Error getting URL's");
+            eprintln!("Error getting URL's: {}", e);
         }
     }
 
@@ -301,7 +300,7 @@ pub async fn skip(ctx: &Context, msg: &Message) -> CommandResult {
         .guild_id
         .ok_or_else(|| SunnyError::log("message guild id could not be found"))?;
 
-    let len = queue::skip(ctx, guild_id).await?;
+    queue::skip(ctx, guild_id).await?;
 
     // msg.reply(
     //     &ctx.http,
@@ -324,7 +323,7 @@ pub async fn clear(ctx: &Context, msg: &Message) -> CommandResult {
         .ok_or_else(|| SunnyError::log("message guild id could not be found"))?;
 
     // let len = queue::skip(ctx, guild_id).await?;
-    let queue_call = queue::clear(ctx, guild_id).await;
+    queue::clear(ctx, guild_id).await;
 
     // msg.reply(
     //     &ctx.http,

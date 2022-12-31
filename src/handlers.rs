@@ -5,7 +5,7 @@ use serenity::{async_trait, model::prelude::*, prelude::*};
 use songbird::{Event, EventContext, EventHandler as VoiceEventHandler};
 use tracing::{event, instrument, Level};
 
-use crate::effects::{self, now_playing};
+use crate::effects::{self};
 use crate::emit;
 use crate::structs::EventConfig;
 
@@ -13,13 +13,13 @@ pub struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, ctx: Context, _ready: Ready) {
+    async fn ready(&self, _ctx: Context, _ready: Ready) {
         // let activity = Activity::streaming(
         //     "\u{1f4fb} Tropico News Today \u{1f9e8}",
         //     "https://www.youtube.com/watch?v=BmKMrUMS9lg",
         // );
 
-        let status = OnlineStatus::DoNotDisturb;
+        let _status = OnlineStatus::DoNotDisturb;
 
         // ctx.set_presence(Some(activity), status).await;
     }

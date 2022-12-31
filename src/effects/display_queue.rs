@@ -194,8 +194,6 @@ pub async fn send_embed(
     }
 
     Ok(())
-
-    // await_interactions(ctx, message, guild_id).await
 }
 
 async fn await_interactions(ctx: &Context, mut msg: Message, guild_id: GuildId) -> SunnyResult<()> {

@@ -7,11 +7,9 @@ use serenity::{
 use tracing::{span, Instrument, Level};
 
 use crate::{
-    commands, effects,
     helper_functions::{
         clear_messages, does_bot_need_to_join, is_channel_dwin_audio_helper, join_voice,
     },
-    structs::EventConfig,
     utils::SunnyError,
 };
 
@@ -92,7 +90,6 @@ pub async fn in_same_voice_check_and_join(
                 println!("Joining and clearning");
                 join_voice(ctx, msg).await?;
                 clear_messages(ctx, msg, args.clone()).await;
-                // commands::queue(ctx, msg, args.clone()).await;
             }
         }
         Err(e) => {

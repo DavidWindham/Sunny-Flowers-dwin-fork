@@ -1,8 +1,7 @@
 use std::num::NonZeroUsize;
 
 use serenity::{client::Context, model::id::GuildId};
-use songbird::tracks::{Queued, TrackHandle};
-use tracing::instrument;
+use songbird::tracks::TrackHandle;
 
 use crate::utils::{SunnyError, SunnyResult};
 
@@ -30,7 +29,7 @@ pub async fn clear(ctx: &Context, guild_id: GuildId) {
                             println!("Song removed from queue");
                         }
                         Err(e) => {
-                            eprintln!("Error removing song from queue");
+                            eprintln!("Error removing song from queue: {}", e);
                         }
                     }
                 }
