@@ -33,7 +33,7 @@ use tokio::signal::unix::{signal, SignalKind};
 use tracing::{event, Level};
 
 #[group]
-#[commands(pause, play, resume, skip, stop, queue)]
+#[commands(play, pause, resume, skip, stop, shuffle, leave, queue, clear)]
 // #[commands(
 //     join,
 //     leave,

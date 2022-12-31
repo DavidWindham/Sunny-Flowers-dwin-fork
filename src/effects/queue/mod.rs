@@ -1,6 +1,7 @@
 //! # Queue Effects
 //! These effects affect the queue in some way or another.
 
+mod clear;
 mod pause;
 mod play;
 mod remove_at;
@@ -10,6 +11,7 @@ mod skip;
 mod stop;
 mod swap;
 
+pub use clear::clear;
 pub use pause::pause;
 pub use play::{play, EnqueueAt};
 pub use remove_at::remove_at;

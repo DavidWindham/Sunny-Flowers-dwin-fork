@@ -81,6 +81,7 @@ pub async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 
     Ok(())
 }
+*/
 
 #[command]
 #[only_in(guilds)]
@@ -98,7 +99,6 @@ pub async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 
     Ok(())
 }
-*/
 
 fn validate_url(mut args: Args) -> Option<String> {
     let mut url: String = args.single().ok()?;
@@ -169,16 +169,6 @@ pub async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     Ok(())
 }
 
-enum UrlType {
-    Youtube,
-    YoutubePlaylist,
-    SpotifyPlaylist,
-}
-
-fn check_url_type(url: String) -> Result<UrlType, String> {
-    Ok(UrlType::Youtube)
-}
-
 /*
 #[command]
 #[aliases(pn)]
@@ -202,6 +192,7 @@ pub async fn play_next(ctx: &Context, msg: &Message, args: Args) -> CommandResul
 
     Ok(())
 }
+*/
 
 #[command]
 #[only_in(guilds)]
@@ -216,6 +207,7 @@ pub async fn shuffle(ctx: &Context, msg: &Message) -> CommandResult {
     Ok(())
 }
 
+/*
 #[command]
 #[only_in(guilds)]
 #[min_args(2)]
@@ -310,6 +302,29 @@ pub async fn skip(ctx: &Context, msg: &Message) -> CommandResult {
         .ok_or_else(|| SunnyError::log("message guild id could not be found"))?;
 
     let len = queue::skip(ctx, guild_id).await?;
+
+    // msg.reply(
+    //     &ctx.http,
+    //     format!(
+    //         "Song skipped: {} in queue.",
+    //         len.checked_sub(1).unwrap_or_default()
+    //     ),
+    // )
+    // .await?;
+    Ok(())
+}
+
+#[command]
+#[only_in(guilds)]
+#[checks(In_Voice)]
+/// Skips the currently playing song and starts the next song in the queue.
+pub async fn clear(ctx: &Context, msg: &Message) -> CommandResult {
+    let guild_id = msg
+        .guild_id
+        .ok_or_else(|| SunnyError::log("message guild id could not be found"))?;
+
+    // let len = queue::skip(ctx, guild_id).await?;
+    let queue_call = queue::clear(ctx, guild_id).await;
 
     // msg.reply(
     //     &ctx.http,
