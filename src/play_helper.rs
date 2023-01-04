@@ -32,10 +32,34 @@ pub async fn get_urls(url: String) -> Result<Vec<String>, String> {
         return get_urls_for_youtube_playlist(youtube_key, url).await;
     }
 
-    return Ok(vec![]);
+    Err("No URL's found".to_string())
 }
 
-fn _get_url_for_search_term(search_term: String) {}
+pub async fn get_urls_for_search_term(search_term: String) -> Result<Vec<String>, String> {
+    let youtube_key =
+        env::var("YOUTUBE_TOKEN").expect("Environment variable YOUTUBE_TOKEN not found");
+    let url_call = get_url_for_search_term(youtube_key, search_term).await;
+    match url_call {
+        Ok(urls) => Ok(urls),
+        Err(e) => Err(format!("No URL's found: {}", e)),
+    }
+}
+
+async fn get_url_for_search_term(
+    youtube_key: String,
+    search_term: String,
+) -> Result<Vec<String>, String> {
+    let urls_call =
+        youtube::get_youtube_urls_from_string_vector(youtube_key.as_str(), vec![search_term]).await;
+
+    match urls_call {
+        Ok(urls) => Ok(urls),
+        Err(e) => {
+            eprintln!("Error getting URLs for search term: {}", e);
+            Err(e)
+        }
+    }
+}
 
 async fn get_urls_for_spotify_playlist(
     client_id: String,

@@ -18,7 +18,7 @@ use crate::{
         self, display_queue,
         queue::{self, EnqueueAt},
     },
-    play_helper::get_urls,
+    play_helper::{get_urls, get_urls_for_search_term},
     utils::SunnyError,
 };
 
@@ -111,9 +111,29 @@ fn validate_url(mut args: Args) -> Option<String> {
     Some(url)
 }
 
+fn validate_term(mut args: Args) -> Option<String> {
+    let mut string_to_return: String = String::new();
+    for arg_call in args.iter::<String>() {
+        match arg_call {
+            Ok(arg) => {
+                string_to_return += arg.as_str();
+                string_to_return += " ";
+            }
+            Err(e) => {
+                eprintln!("error unwrapping arg: {}", e);
+            }
+        }
+    }
+
+    if string_to_return != "" {
+        return Some(string_to_return);
+    }
+
+    None
+}
+
 #[command]
 #[aliases(p)]
-#[max_args(1)]
 #[only_in(guilds)]
 #[usage("<url>")]
 #[example("https://www.youtube.com/watch?v=dQw4w9WgXcQ")]
@@ -124,24 +144,31 @@ fn validate_url(mut args: Args) -> Option<String> {
 /// While Sunny is in a voice channel, you may run the play command so that she
 /// can start streaming the given video URL.
 pub async fn play(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    let url = validate_url(args).ok_or_else(|| SunnyError::user("Unable to parse url"))?;
+    // validate_term(args.clone());
+
+    let url_validation_call = validate_url(args.clone());
+    let urls_call: Result<Vec<String>, String>;
+    match url_validation_call {
+        Some(url) => {
+            urls_call = get_urls(url).await;
+        }
+        None => {
+            let search_term_call = validate_term(args);
+            match search_term_call {
+                Some(search_term) => {
+                    println!("Search term was found: {}", search_term);
+                    urls_call = get_urls_for_search_term(search_term).await;
+                }
+                None => return Ok(()), //return SunnyError::user("Unable to parse url"),
+            }
+        }
+    }
 
     let guild_id = msg
         .guild_id
         .ok_or_else(|| SunnyError::log("message guild id could not be found"))?;
 
-    // let urls_call = get_urls(url);
-    let urls_call = get_urls(url).await;
-
-    // let _len = queue::play(ctx, guild_id, url, EnqueueAt::Back).await?;
-
-    // let reply = if len == 1 {
-    //     "Started playing the song".to_string()
-    // } else {
-    //     format!("Added song to queue: position {}", len - 1)
-    // };
-
-    // msg.reply(&ctx.http, reply).await?;
+    // let url = validate_url(args).ok_or_else(|| SunnyError::user("Unable to parse url"))?;
 
     match urls_call {
         Ok(urls) => {
