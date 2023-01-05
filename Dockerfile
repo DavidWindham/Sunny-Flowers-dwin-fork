@@ -1,26 +1,16 @@
-FROM lukemathwalker/cargo-chef:latest-rust-1.55.0-alpine as chef
-WORKDIR /app
+FROM rust:latest
 
-FROM chef AS planner
+# Dependencies
+RUN apt-get update
+RUN apt-get install -y ffmpeg
+RUN apt-get install -y youtube-dl
+# Currently youtube-dl seems to have some weird bug in it? This fixes it, no idea why currently, not worth investigating for now"
+RUN apt-get install -y python3-pip
+RUN pip install --upgrade youtube-dl
+
+WORKDIR /Sunny-Flowers-dwin-fork
+COPY Cargo.toml .
 COPY . .
-RUN cargo chef prepare --recipe-path recipe.json
+RUN cargo build --release
 
-FROM chef AS builder
-COPY --from=planner /app/recipe.json recipe.json
-
-# install system dependencies
-RUN apk add --no-cache opus-dev autoconf automake
-ARG RUSTFLAGS='-C target-feature=-crt-static'
-
-# Build dependencies - this is the caching Docker layer!
-RUN cargo chef cook --release --recipe-path recipe.json
-
-# Build application
-COPY . .
-RUN cargo build --release --offline --bin sunny_flowers
-
-FROM alpine:edge AS runtime
-WORKDIR /app
-RUN apk add --no-cache ffmpeg youtube-dl
-COPY --from=builder /app/target/release/sunny_flowers /usr/local/bin
-CMD ["/usr/local/bin/sunny_flowers"]
+CMD ["/Sunny-Flowers-dwin-fork/target/release/sunny-flowers-dwin-fork"]
