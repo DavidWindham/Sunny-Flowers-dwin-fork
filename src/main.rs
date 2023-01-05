@@ -16,7 +16,7 @@ pub mod url_handler;
 use std::env;
 
 use commands::*;
-use hooks::{after_hook, dispatch_error_hook};
+use hooks::{after_hook, before_hook, dispatch_error_hook};
 
 use dotenv::dotenv;
 
@@ -101,6 +101,7 @@ pub async fn init_bot(token: String, app_id: u64, cmd_prefix: String) -> Client 
         .group(&GENERAL_GROUP)
         .help(&HELP)
         .on_dispatch_error(dispatch_error_hook)
+        .before(before_hook)
         .after(after_hook);
 
     Client::builder(&token)

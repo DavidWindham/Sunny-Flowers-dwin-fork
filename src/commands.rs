@@ -229,7 +229,6 @@ pub async fn shuffle(ctx: &Context, msg: &Message) -> CommandResult {
         .ok_or_else(|| SunnyError::log("Failed to get guild id"))?;
 
     queue::shuffle(ctx, guild_id).await?;
-    msg.reply(&ctx.http, "Queue Shuffled :game_die:!").await?;
     Ok(())
 }
 
